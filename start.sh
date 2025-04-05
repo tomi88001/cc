@@ -1,5 +1,6 @@
 #!/bin/bash
 # sh start.sh https://admin.htfxaus.com/admin/admin/login 1000 100
+# python3 main.py "cc" "https://admin.htfxaus.com/admin/admin/login" 1000 100
 cd /root/cc
 # 运行 Python 脚本，并后台执行
 PYTHON_SCRIPT="main.py"

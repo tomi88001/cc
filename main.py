@@ -188,7 +188,7 @@ def InputOption(question,options,default):
 
 def CheckerOption():
 	global proxies
-	out_file = "socks5.txt"
+	out_file = "/root/cc/socks5.txt"
 	check_list(out_file)
 	proxies = open(out_file).readlines()
 	if len(proxies) == 0:
@@ -457,11 +457,11 @@ def check_socks(ms):#Coded by BlueSkyXN
 		sys.stdout.flush()
 	print("\r\n> Checked all proxies, Total Worked:"+str(len(proxies)))
 
-	with open("socks5.txt", 'wb') as fp:
+	with open("/root/cc/socks5.txt", 'wb') as fp:
 		for lines in list(proxies):
 			fp.write(bytes(lines,encoding='utf8'))
 	fp.close()
-	print("> They are saved in socks5.txt.")
+	print("保存可用代理到 /root/cc/socks5.txt")
 			
 def check_list(socks_file):
 	print("> Checking list")
