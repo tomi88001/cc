@@ -1,6 +1,6 @@
 #!/bin/bash
 
-for pid in $(pgrep -f 'python3 main'); do  # 使用 pgrep -f 来精确匹配整个命令
+for pid in $(pgrep -f 'main.py cc'); do  # 使用 pgrep -f 来精确匹配整个命令
     echo "Force stopping process with PID: $pid"
     
     # 强制终止进程
