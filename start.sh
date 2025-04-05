@@ -1,5 +1,4 @@
 #!/bin/bash
-git pull
 # sh start.sh https://admin.htfxaus.com/admin/admin/login 1000 100
 # 运行 Python 脚本，并后台执行
 PYTHON_SCRIPT="main.py"
