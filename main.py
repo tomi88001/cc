@@ -488,13 +488,12 @@ def main():
 
 	parser = argparse.ArgumentParser(
 	description="压力测试工具参数配置",
-	epilog="使用示例: python3 atk.py cc https://example.com 1000 600 100"
+	epilog="使用示例: python3 atk.py cc https://example.com 1000 100"
 	)
 	# 必需参数
 	parser.add_argument('mode', type=str, choices=['cc', 'post', 'head', 'slow', 'check'], help="攻击模式: [cc/post/head/slow/check]")
 	parser.add_argument('url', type=str, help="目标URL (示例: https://example.com/path)")
 	parser.add_argument('thread', type=int, help="并发线程数 (建议 100-5000)")
-	parser.add_argument('time', type=int, help="持续时间 (秒)")
 	parser.add_argument('rps', type=int, help="每秒请求数")
 	args = parser.parse_args()
 
@@ -504,7 +503,6 @@ def main():
 	模式\t: {args.mode}
 	目标\t: {args.url}
 	线程\t: {args.thread}
-	时长\t: {args.time}秒
 	RPS\t: {args.rps}/秒
 	========================
 	""")
