@@ -4,7 +4,7 @@ for pid in $(pgrep -f 'main.py cc'); do  # 使用 pgrep -f 来精确匹配整个
     echo "Force stopping process with PID: $pid"
     
     # 强制终止进程
-    pkill -9 "$pid"
+    kill -9 "$pid"
     
     # 打印已停止进程的信息
     if ! ps -p "$pid" > /dev/null; then
