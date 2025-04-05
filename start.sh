@@ -1,9 +1,9 @@
 #!/bin/bash
 # sh start.sh https://admin.htfxaus.com/admin/admin/login 1000 100
+cd /root/cc
 # 运行 Python 脚本，并后台执行
 PYTHON_SCRIPT="main.py"
 sh stop.sh
-cd /root/cc
 if [ "$4" = "back" ]; then
     if [ ! -d "$PYTHON_SCRIPT" ]; then
         nohup python3 "$PYTHON_SCRIPT" "cc" "$1" "$2" "$3" > output.log 2>&1 &
