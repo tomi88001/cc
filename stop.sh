@@ -1,31 +1,23 @@
 #!/bin/bash
 
-# 获取所有匹配的PID（安全方式）
+# 安全获取所有匹配的PID
 pids=()
 while IFS= read -r pid; do
     pids+=("$pid")
-done < <(pgrep -f 'python3 main' 2>/dev/null)
+done < <(pgrep -f 'python3 main' 2>/dev/null)  # 注意这里是英文符号
 
 if [ ${#pids[@]} -eq 0 ]; then
-    echo "没有找到运行的 python3 main 进程"
+    echo "No running python3 main processes found"
     exit 0
 fi
 
-# 终止所有目标进程
+# 终止进程
 for pid in "${pids[@]}"; do
-    if [ ! -d "/proc/$pid" ]; then  # 更可靠的进程存在检查
-        echo "PID $pid 已不存在"
-        continue
-    fi
-
-    echo "正在强制停止进程: $pid ($(ps -p "$pid" -o cmd=))"
-    
-    if kill -9 "$pid" 2>/dev/null; then
-        echo "✓ 成功终止 PID $pid"
-    else
-        echo "✗ 无法终止 PID $pid (权限不足或进程已退出)"
-    fi
+    echo "Killing PID: $pid"
+    kill -9 "$pid" 2>/dev/null && echo "Success" || echo "Failed"
 done
+
+echo "All targets processed"
 
 # 二次确认
 remaining=$(pgrep -f 'python3 main' | wc -l)
